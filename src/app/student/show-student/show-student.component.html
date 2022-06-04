@@ -1,0 +1,48 @@
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" (click)="modalAdd()">
+  Add Student
+</button>
+
+<table class="table table-sm ">
+    <thead>
+        <tr>
+            <th scope="col ">Id</th>
+            <th scope="col ">Name</th>
+            <th scope="col ">Age</th>
+            <th scope="col ">Address tt</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let item of students|async ">
+            <td>{{item.Id}}</td>
+            <td>{{item.Name}}</td>
+            <td>{{item.Age}}</td>
+            <td>{{item.Address}}</td>
+            <td>
+                <button class="btn btn-outline-primary me-2 mb-1" (click)="modalEdit(item)" data-toggle="modal" data-target="#exampleModal">Edit </button>
+
+                <button class="btn btn-outline-danger me-2 mb-1" (click)="delete(item)">Delete </button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{modalTile}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalClose()" id="add-edit-modal-close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+            </div>
+            <div class="modal-body">
+                <app-add-edit-student [student]="student" *ngIf="activeAddEditStudentComponent"></app-add-edit-student>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="alert alert-success" role="alert" id="add-success-alert"> Student successfully added! </div>
+<div class="alert alert-success" role="alert" id="update-success-alert">Student successfully updated! </div>
+<div class="alert alert-success" role="alert" id="delete-success-alert">Student successfully deleted! </div>
