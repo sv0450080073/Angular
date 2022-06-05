@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { StudentService } from 'src/app/Service/student.service';
+import { Result } from 'src/app/shared/result';
 import { Student } from 'src/app/shared/student.model';
 
 @Component({
@@ -11,11 +13,12 @@ import { Student } from 'src/app/shared/student.model';
 export class ShowStudentComponent implements OnInit {
 
   students : Observable<Student[]>;
-
-  constructor(private studentService : StudentService) { }
+  result: Result;
+  constructor(private studentService : StudentService,private toastr:ToastrService) { }
 
   ngOnInit() {
     this.students = this.studentService.getStudentsV1();
+    console.log(this.students);
   }
   modalTile: string ='';
   activeAddEditStudentComponent : boolean =false;
@@ -24,6 +27,7 @@ export class ShowStudentComponent implements OnInit {
 modalAdd() {
   this.student = {
     Id:0 ,
+    Index:0,
     Name:null,
     Age:0,
     Address:null
@@ -41,23 +45,25 @@ modalClose() {
   this.students = this.studentService.getStudentsV1();
 }
 delete(item:any) {
-  if(confirm(`Are you sure you want to delete student ${item.Id}`)) {
+  if(confirm(`Are you sure you want to delete student ${item.Index}`)) {
     this.studentService.deleteStudent(item.Id).subscribe(res => {
       var closeModalBtn = document.getElementById('add-edit-modal-close');
       if(closeModalBtn)
       {
         closeModalBtn.click();
       }
-      var showDeleteSuccess =  document.getElementById('Delete-success-alert');
-      if(showDeleteSuccess)
-      {
-        showDeleteSuccess.style.display = "block";
+      this.result = res;
+      console.log(res);
+      if(this.result.IsSuccess)
+      {  setTimeout(() => {
+        window.alert("Student successfully deleted ! ");
+      }, 1000);
       }
-      setTimeout(function() {
-        if(showDeleteSuccess) {
-          showDeleteSuccess.style.display = "none";
-        }
-      }, 4000);
+      else
+      {setTimeout(() => {
+        window.alert("Student failly deleted !");
+      }, 1000);
+      }
       this.studentService.getStudentsV1();
     })
   }

@@ -5,3 +5,11 @@
 .form-control.ng-touched.ng-valid {
     border: 1px solid green;
 }
+
+#toast-container>div {
+    opacity: 1;
+}
+
+.btn-addEdit {
+    margin: 5px;
+}

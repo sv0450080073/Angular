@@ -13,6 +13,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ClassComponent } from './class/class.component';
 import { AddEditStudentComponent } from './student/add-edit-student/add-edit-student.component';
 import { ShowStudentComponent } from './student/show-student/show-student.component';
+import { ToastrModule } from 'ngx-toastr';
 
 
 @NgModule({
@@ -30,7 +31,12 @@ import { ShowStudentComponent } from './student/show-student/show-student.compon
     HttpClientModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ToastrModule.forRoot({
+      timeOut:500,
+      positionClass:'toast-top-right',
+      preventDuplicates:false,
+     })
 
   ],
   providers: [ { provide: APP_BASE_HREF, useValue: "/" },StudentService ],

@@ -27,7 +27,9 @@
                             "src/assets"
                         ],
                         "styles": [
-                            "src/styles.scss"
+                            "src/styles.scss",
+                            "node_modules/ngx-toastr/toastr.css"
+
                         ],
                         "scripts": [],
                         "es5BrowserSupport": true
@@ -80,9 +82,13 @@
                         "tsConfig": "src/tsconfig.spec.json",
                         "karmaConfig": "src/karma.conf.js",
                         "styles": [
-                            "src/styles.scss"
+                            "src/styles.scss",
+                            "node_modules/ngx-toastr.css"
+
                         ],
-                        "scripts": [],
+                        "scripts": [
+
+                        ],
                         "assets": [
                             "src/favicon.ico",
                             "src/assets"

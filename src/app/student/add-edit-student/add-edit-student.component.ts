@@ -1,7 +1,10 @@
 import { Component, Input,OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
+
 import { StudentService } from 'src/app/Service/student.service';
+import { Result } from 'src/app/shared/result';
 import { Student } from 'src/app/shared/student.model';
 @Component({
   selector: 'app-add-edit-student',
@@ -10,14 +13,14 @@ import { Student } from 'src/app/shared/student.model';
 })
 export class AddEditStudentComponent implements OnInit {
 
-  constructor(private studentService:StudentService) { }
+  constructor(private studentService:StudentService , private toastr:ToastrService) { }
   exform:FormGroup;
-
+  result : Result ={ IsSuccess : false};
   @Input() student: Student;
   Id:number  = 0 ;
   Name:string = "";
   Age:number = 0;
-  Address: string = "tttttt";
+  Address: string = "";
   ngOnInit() : void {
   this.Id = this.student.Id;
   this.Name = this.student.Name;
@@ -25,12 +28,16 @@ export class AddEditStudentComponent implements OnInit {
   this.Address = this.student.Address;
   //validate
     this.exform = new FormGroup({
-      'name' : new FormControl('Manh',Validators.required),
-      'age' : new FormControl('1',Validators.required),
-      'address' : new FormControl('1',Validators.required)
+      'name' : new FormControl(null,Validators.required),
+      'age' : new FormControl(
+        null,
+        [Validators.required,
+          Validators.min(1),
+          Validators.max(100),
+        ]
+        ),
+      'address' : new FormControl(null,Validators.required)
     })
-
-
   }
   addStudent(){
     var studenttemp = {
@@ -38,23 +45,26 @@ export class AddEditStudentComponent implements OnInit {
       Age:this.Age,
       Address:this.Address
     }
-    console.log(studenttemp);
-    this.studentService.createStudent(studenttemp).subscribe(res=> {
+    this.studentService.createStudent(studenttemp).toPromise()
+    .then(response => {
+      this.result = response;
       var closeModalBtn = document.getElementById('add-edit-modal-close');
       if(closeModalBtn)
       {
         closeModalBtn.click();
       }
-      var showAddSuccess =  document.getElementById('add-success-alert');
-      if(showAddSuccess)
-      {
-        showAddSuccess.style.display = "block";
+      console.log(response);
+      if(this.result.IsSuccess)
+      {  setTimeout(() => {
+        window.alert("Student successfully added ! ");
+      }, 1000);
+
       }
-      setTimeout(function() {
-        if(showAddSuccess) {
-          showAddSuccess.style.display = "none";
-        }
-      }, 4000);
+      else
+      {setTimeout(() => {
+        window.alert("Student failly added ! ");
+      }, 1000);
+      }
     })
   }
   updateStudent(){
@@ -71,16 +81,18 @@ export class AddEditStudentComponent implements OnInit {
       {
         closeModalBtn.click();
       }
-      var showUpdateSuccess =  document.getElementById('update-success-alert');
-      if(showUpdateSuccess)
-      {
-        showUpdateSuccess.style.display = "block";
+      this.result = res;
+      if(this.result.IsSuccess)
+      {  setTimeout(() => {
+        window.alert("Student successfully updated !");
+      }, 1000);
+
       }
-      setTimeout(function() {
-        if(showUpdateSuccess) {
-          showUpdateSuccess.style.display = "none";
-        }
-      }, 4000);
+      else
+      {setTimeout(() => {
+        window.alert("Student failly updated !");
+      }, 1000);
+      }
     })
   }
 

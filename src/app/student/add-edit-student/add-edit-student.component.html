@@ -1,21 +1,28 @@
-<form [formGroup]="exform">
-    <div class="mb-3">
-        <label for="Name" class="form-label">Student Name</label>
-        <input formControlName="name" type="text" class="form-control" name="Name" [(ngModel)]="Name">
-        <small *ngIf="name.invalid && name.touched" class="text-danger">Student Name is Required</small>
+<form [formGroup]="exform" class="form-horizontal">
+    <div class="form-group">
+        <label for="Name" class="form-label col-sm-3">Student Name: </label>
+        <div class="col-sm-9">
+            <input formControlName="name" type="text" class="form-control" name="Name" [(ngModel)]="Name">
+            <small *ngIf="name.invalid && name.touched" class="text-danger">Student Name is Required</small>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="Age" class="form-label col-sm-3">Age: </label>
+        <div class="col-sm-9">
+            <input formControlName="age" type="number" class="form-control" name="Age" [(ngModel)]="Age">
+            <small *ngIf="age.invalid && age.touched" class="text-danger">Age is Required(1 < Age < 100, numbers are only allowed)</small>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="Address" class="form-label col-sm-3">Address: </label>
+        <div class="col-sm-9">
+            <input type="text" formControlName="address" class="form-control" name="Address" [(ngModel)]="Address">
+            <small *ngIf="address.invalid && address.touched" class="text-danger">Address is Required</small>
+        </div>
+    </div>
+    <div class="text-center">
+        <button [disabled]="exform.invalid" (click)="addStudent()" *ngIf="student.Id ==0" class="btn btn-primary btn-addEdit">Save</button>
+        <button [disabled]="exform.invalid" (click)="updateStudent()" *ngIf="student.Id !=0" class="btn btn-primary btn-addEdit">Save</button>
+    </div>
 
-    </div>
-    <div class="mb-3">
-        <label for="Age" class="form-label">Age</label>
-        <input formControlName="age" type="number" class="form-control" name="Age" [(ngModel)]="Age">
-        <small *ngIf="age.invalid && age.touched" class="text-danger">Age is Required</small>
-
-    </div>
-    <div class="mb-3">
-        <label for="Address" class="form-label">Address</label>
-        <input type="text" formControlName="address" class="form-control" name="Address" [(ngModel)]="Address">
-        <small *ngIf="address.invalid && address.touched" class="text-danger">Address is Required</small>
-    </div>
-    <button [disabled]="exform.invalid" (click)="addStudent()" *ngIf="student.Id ==0" class="btn btn-primary">Add</button>
-    <button [disabled]="exform.invalid" (click)="updateStudent()" *ngIf="student.Id !=0" class="btn btn-primary">Update</button>
 </form>

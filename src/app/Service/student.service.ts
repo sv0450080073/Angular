@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Student } from '../shared/student.model';
 import { Observable } from 'rxjs';
+import { Result } from '../shared/result';
 
 @Injectable({
   providedIn: 'root'
@@ -33,15 +34,15 @@ url = 'https://localhost:44333/Student';
   getStudents() {
     return this.httpClient.get("https://localhost:44333/Student/GetStudent");
   }
-  createStudent(student: any)
+  createStudent(student: any):Observable<Result>
   {
-    return this.httpClient.post("https://localhost:44333/Student/InsertStudent",student);
+    return this.httpClient.post<Result>("https://localhost:44333/Student/InsertStudent",student);
   }
-  updateStudent(student:any) {
-    return this.httpClient.put("https://localhost:44333/Student/UpdateStudent", student);
+  updateStudent(student:any):Observable<Result> {
+    return this.httpClient.put<Result>("https://localhost:44333/Student/UpdateStudent", student);
   }
-  deleteStudent(id:number|string ){
-    return this.httpClient.delete("https://localhost:44333/Student/DeleteStudentById/" + `${id}`);
+  deleteStudent(id:number|string ):Observable<Result>{
+    return this.httpClient.delete<Result>("https://localhost:44333/Student/DeleteStudentById/" + `${id}`);
   }
   getStudentById(id:number|string) {
     return this.httpClient.get("https://localhost:44333/Student/GetStudent/" + `${id}` );
