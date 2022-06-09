@@ -9,7 +9,7 @@ import { Result } from '../shared/result';
 })
 export class StudentService {
 formData: Student;
-url = 'https://localhost:44333/Student';
+url = 'https://localhost:44333/Employee';
   constructor(private httpClient:HttpClient) { }
 
   getStudentsV1():Observable<Student[]> {

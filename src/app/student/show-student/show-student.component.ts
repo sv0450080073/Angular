@@ -11,7 +11,7 @@ import { Student } from 'src/app/shared/student.model';
   styleUrls: ['./show-student.component.scss']
 })
 export class ShowStudentComponent implements OnInit {
-
+  isLoading: boolean = false;
   students : Observable<Student[]>;
   result: Result;
   constructor(private studentService : StudentService,private toastr:ToastrService) { }
@@ -32,41 +32,53 @@ modalAdd() {
     Age:0,
     Address:null
   }
-  this.modalTile  = "Add Student ";
+  this.modalTile  = "Add Employee ";
   this.activeAddEditStudentComponent = true;
 }
 modalEdit(item:any){
   this.activeAddEditStudentComponent = true;
   this.student = item;
-  this.modalTile = "Edit Student "
+  this.modalTile = "Edit Employee "
 }
 modalClose() {
   this.activeAddEditStudentComponent = false;
   this.students = this.studentService.getStudentsV1();
+  console.log(this.students );
+
 }
 delete(item:any) {
-  if(confirm(`Are you sure you want to delete student ${item.Index}`)) {
+  if(confirm(`Are you sure you want to delete employee ${item.Index}`)) {
+
+    this.isLoading =  true;
     this.studentService.deleteStudent(item.Id).subscribe(res => {
+      this.isLoading =  false;
       var closeModalBtn = document.getElementById('add-edit-modal-close');
       if(closeModalBtn)
       {
         closeModalBtn.click();
       }
       this.result = res;
-      console.log(res);
       if(this.result.IsSuccess)
-      {  setTimeout(() => {
-        window.alert("Student successfully deleted ! ");
-      }, 1000);
+      {
+        this.toastr.success("Employee successfully deleted !", "Success");
+      //   setTimeout(() => {
+      //   window.alert(" ");
+      // }, 1000);
       }
       else
-      {setTimeout(() => {
-        window.alert("Student failly deleted !");
-      }, 1000);
+      {
+
+        this.toastr.error("Employee failly deleted !", "Fail");
+      //   setTimeout(() => {
+      //   window.alert("Student failly deleted !");
+      // }, 1000);
       }
       this.studentService.getStudentsV1();
     })
   }
+}
+loaderHanler($event) {
+  this.isLoading = $event;
 }
 
 }

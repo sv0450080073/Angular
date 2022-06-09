@@ -14,6 +14,8 @@ import { ClassComponent } from './class/class.component';
 import { AddEditStudentComponent } from './student/add-edit-student/add-edit-student.component';
 import { ShowStudentComponent } from './student/show-student/show-student.component';
 import { ToastrModule } from 'ngx-toastr';
+import { LoaderComponent } from './loader/loader.component';
+import { MetricReprocessComponent } from './metric-reprocess/metric-reprocess.component';
 
 
 @NgModule({
@@ -23,7 +25,9 @@ import { ToastrModule } from 'ngx-toastr';
     StudentComponent,
     ClassComponent,
     AddEditStudentComponent,
-    ShowStudentComponent
+    ShowStudentComponent,
+    LoaderComponent,
+    MetricReprocessComponent
   ],
   imports: [
     BrowserModule,
@@ -33,7 +37,7 @@ import { ToastrModule } from 'ngx-toastr';
     AppRoutingModule,
     ReactiveFormsModule,
     ToastrModule.forRoot({
-      timeOut:500,
+      timeOut: 1000,
       positionClass:'toast-top-right',
       preventDuplicates:false,
      })

@@ -1,4 +1,4 @@
-import { Component, Input,OnInit } from '@angular/core';
+import { Component, EventEmitter, Input,OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
@@ -17,6 +17,8 @@ export class AddEditStudentComponent implements OnInit {
   exform:FormGroup;
   result : Result ={ IsSuccess : false};
   @Input() student: Student;
+  @Output()
+  public onLoaded = new EventEmitter<boolean>();
   Id:number  = 0 ;
   Name:string = "";
   Age:number = 0;
@@ -28,15 +30,15 @@ export class AddEditStudentComponent implements OnInit {
   this.Address = this.student.Address;
   //validate
     this.exform = new FormGroup({
-      'name' : new FormControl(null,Validators.required),
-      'age' : new FormControl(
+      'n' : new FormControl(null,Validators.required),
+      'a' : new FormControl(
         null,
         [Validators.required,
           Validators.min(1),
           Validators.max(100),
         ]
         ),
-      'address' : new FormControl(null,Validators.required)
+      'ad' : new FormControl(null,Validators.required)
     })
   }
   addStudent(){
@@ -45,25 +47,27 @@ export class AddEditStudentComponent implements OnInit {
       Age:this.Age,
       Address:this.Address
     }
+    this.onLoaded.emit(true);
+    console.log(studenttemp);
     this.studentService.createStudent(studenttemp).toPromise()
     .then(response => {
+      this.onLoaded.emit(false);
+      console.log(response);
+
       this.result = response;
       var closeModalBtn = document.getElementById('add-edit-modal-close');
       if(closeModalBtn)
       {
         closeModalBtn.click();
       }
-      console.log(response);
       if(this.result.IsSuccess)
-      {  setTimeout(() => {
-        window.alert("Student successfully added ! ");
-      }, 1000);
+      {
+        this.toastr.success("Employee successfully added !", "Success");
 
       }
       else
-      {setTimeout(() => {
-        window.alert("Student failly added ! ");
-      }, 1000);
+      {
+        this.toastr.error("Employee failly added !", "Fail");
       }
     })
   }
@@ -75,39 +79,42 @@ export class AddEditStudentComponent implements OnInit {
       Address:this.Address
     }
       var id:number   = this.Id;
+      this.onLoaded.emit(true);
        this.studentService.updateStudent(studenttemp).subscribe(res=> {
+        this.onLoaded.emit(false);
       var closeModalBtn = document.getElementById('add-edit-modal-close');
       if(closeModalBtn)
       {
         closeModalBtn.click();
       }
       this.result = res;
+
+
       if(this.result.IsSuccess)
-      {  setTimeout(() => {
-        window.alert("Student successfully updated !");
-      }, 1000);
+      {
+        this.toastr.success("Employee successfully updated !", "Success");
 
       }
       else
-      {setTimeout(() => {
-        window.alert("Student failly updated !");
-      }, 1000);
+      {
+        this.toastr.error("Employee failly updated !", "Fail");
       }
+
     })
   }
 
   //#region  Property
   get name()
   {
-    return this.exform.get('name');
+    return this.exform.get('n');
   }
   get age()
   {
-    return this.exform.get('age');
+    return this.exform.get('a');
   }
   get address()
   {
-    return this.exform.get('address');
+    return this.exform.get('ad');
   }
   //#endregion
 }

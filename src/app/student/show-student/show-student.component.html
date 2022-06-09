@@ -1,13 +1,13 @@
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-info btn-lg btn-add" data-toggle="modal" data-target="#exampleModal" (click)="modalAdd()">
-  Add Student
+  Add Employee
 </button>
 
 <table class="table table-bordered table-sm">
     <thead>
         <tr>
             <th scope="col ">Index</th>
-            <th scope="col ">Student Name</th>
+            <th scope="col ">Employee Name</th>
             <th scope="col ">Age</th>
             <th scope="col ">Address</th>
             <th scope="col " style="text-align:center;">Action</th>
@@ -36,12 +36,10 @@
                 <h4 class="modal-title">{{modalTile}}</h4>
             </div>
             <div class="modal-body">
-                <app-add-edit-student [student]="student" *ngIf="activeAddEditStudentComponent"></app-add-edit-student>
+                <app-add-edit-student (onLoaded)="loaderHanler($event)" [student]="student" *ngIf="activeAddEditStudentComponent"></app-add-edit-student>
             </div>
 
         </div>
     </div>
 </div>
-<div class="alert alert-success" role="alert" id="add-success-alert"> Student successfully added! </div>
-<div class="alert alert-success" role="alert" id="update-success-alert">Student successfully updated! </div>
-<div class="alert alert-success" role="alert" id="delete-success-alert">Student successfully deleted! </div>
+<app-loader *ngIf="isLoading"></app-loader>
