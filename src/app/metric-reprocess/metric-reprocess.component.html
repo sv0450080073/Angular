@@ -1,20 +1,147 @@
-<div class="track">
-    <form novalidate (ngSubmit)="onSubmit()" [formGroup]="rfTrackFile">
-        <div class="form-group row">
-            <label for="colFormLabel" class="col-sm-2 col-form-label">Flow: </label>
-            <div class="col-sm-10">
-                <select class="form-control">
-                <option value="1">1</option>
-                <option value="2">2</option>
-              </select>
+<nav>
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a class="nav-item nav-link active " id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Track Files</a>
+        <a class="nav-item nav-link " id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Metrics Reprocess</a>
+        <!-- <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</a> -->
+    </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+
+        <div class="track">
+            <form novalidate (ngSubmit)="onSubmitTrack()" [formGroup]="rfTrackFile">
+                <div class="form-group row">
+                    <label for="colFormLabel" class="col-sm-2 col-form-label">Flow: </label>
+                    <div class="col-sm-10">
+                        <select class="form-control">
+                        <option value="1">Flow</option>
+                    </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="colFormLabel" class="col-sm-2 col-form-label">File List: </label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" rows="3" formControlName="files">  </textarea>
+                        <small *ngIf="files.invalid && files.touched" class="text-danger">File List is required. </small>
+                    </div>
+                </div>
+                <div class="btn-center ">
+                    <button type="submit" [disabled]="!rfTrackFile.valid" class="col-sm-3 btn btn-primary btn_pd-2  btn-lg btn-block">Track</button>
+                </div>
+            </form>
+        </div>
+        <div class="trackview ">
+            <table class="table-wrapper table table-bordered  ">
+                <thead>
+                    <tr>
+                        <th class="col-sm-1"></th>
+                        <th class="col-sm-1 ">Inbox/Outbox Id</th>
+                        <th class="col-sm-1">Transaction type</th>
+                        <th class="col-sm-2">Integration Status</th>
+                        <th class="col-sm-3">File Name</th>
+                        <th class="col-sm-3">Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of trackDataGrid">
+                        <td class="col-sm-1"> <input [checked]="item.IsChecked" disabled type="checkbox"></td>
+                        <td class="col-sm-1"> {{item.InOutboxId}}</td>
+                        <td class="col-sm-1">{{item.TransactionType}}</td>
+                        <td class="col-sm-2">{{item.IntergrationStatus}}</td>
+                        <td class="col-sm-3 filename">{{item.FileName}}</td>
+                        <td class="col-sm-3 filename">{{item.Note}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+        <div class="mtreprocess">
+            <div class="mtreprocess__searchoptions">
+                <form novalidate (ngSubmit)="onSubmitReprocess()" [formGroup]="rfSearchReprocess">
+                    <div class="form-row">
+                        <div class="col-md-3 ">
+                            <div class="form-check ">
+                                <input type="checkbox" formControlName="isUseMTImportService" class="form-check-input" id="exampleCheck1">
+                                <label class="form-check-label" for="exampleCheck1">Use MT ImportService to import data</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-secondary" (click)="onUnsuccessOrNotImpBtnClick()" type="button">Select all UnSuccess OR Not Importing documents</button>
+                        </div>
+                        <div class="text-center col-md-2 ">
+                            <button class="btn btn-primary" [disabled]="!rfSearchReprocess.valid" type="submit">Reprocess</button>
+                        </div>
+                        <div class="col-md-3 ">
+                            <div class="form-group row">
+                                <label class="col-sm-8 col-form-label" for="">Remaining Processing: </label>
+                                <input class="form-control col-sm-4 inp_ml" formControlName="remainProcess" type="number">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+
+                        <div class="col-md-2">
+                            <div class="form-check radio_pt">
+                                <input class="form-check-input" formControlName="runOptions" type="radio" name="runOptions" id="exampleRadios1" value="multi" checked>
+                                <label class="form-check-label" for="exampleRadios1">
+                          Run with Multi Thread
+                    </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group row formgroup_pl">
+                                <label class="col-sm-6 col-form-label" for="">Number of Threads: </label>
+                                <input class="form-control col-sm-3" maxlength="3" formControlName="numberOfThread" type="number">
+                                <small *ngIf="numberOfThread.invalid && numberOfThread.touched" class="text-danger align-self-center">01 < Number of Threads < 100, numbers are only allowed.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label" for="">Import Service Url: </label>
+                                <input class="form-control col-sm-8 inp_ml" formControlName="importServiceUrl" type="text">
+                                <small *ngIf="importServiceUrl.invalid && importServiceUrl.touched" class="text-danger col align-self-center row  justify-content-center">Import Service Url is required. </small>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="form-row row-mt">
+
+                        <div class="col-md-2">
+                            <div class="form-check radio_pt">
+                                <input class="form-check-input" formControlName="runOptions" type="radio" name="runOptions" id="exampleRadios2" value="parallel">
+                                <label class="form-check-label" for="exampleRadios1">
+                          Run with For Parallel
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="mtreprocess__gridview mtreprocess ">
+                <table class="table-wrapper table table-bordered  ">
+                    <thead>
+                        <tr>
+                            <th class="col-sm-2">Inbox/Outbox Id</th>
+                            <th class="col-sm-2">Customer Id</th>
+                            <th class="col-sm-2"> Year Quarter</th>
+                            <th class="col-sm-6">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of trackDataGrid">
+                            <td class="col-sm-2">{{item.InOutboxId}}</td>
+                            <td class="col-sm-2">{{item.TransactionType}}</td>
+                            <td class="col-sm-2">{{item.IntergrationStatus}}</td>
+                            <td class="col-sm-6">{{item.Note}}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-        <div class="form-group row">
-            <label for="colFormLabel" class="col-sm-2 col-form-label">File List: </label>
-            <div class="col-sm-10">
-                <textarea class="form-control" rows="2" formControlName="files">  </textarea>
-            </div>
-        </div>
-        <button type="submit" class="btn btn-success">Submit</button>
-    </form>
+    </div>
+    <!-- <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div> -->
 </div>
+<app-loader *ngIf="isLoading"></app-loader>

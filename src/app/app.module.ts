@@ -18,6 +18,7 @@ import { LoaderComponent } from './loader/loader.component';
 import { MetricReprocessComponent } from './metric-reprocess/metric-reprocess.component';
 
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -40,7 +41,7 @@ import { MetricReprocessComponent } from './metric-reprocess/metric-reprocess.co
       timeOut: 1000,
       positionClass:'toast-top-right',
       preventDuplicates:false,
-     })
+     }),
 
   ],
   providers: [ { provide: APP_BASE_HREF, useValue: "/" },StudentService ],

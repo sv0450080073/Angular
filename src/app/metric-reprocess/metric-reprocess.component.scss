@@ -1,3 +1,89 @@
 .track {
     margin-top: 20px;
 }
+
+.trackview {
+    height: 300px;
+    overflow: scroll;
+    margin-top: 30px;
+}
+
+// .table-fixed tbody {
+//     height: 300px;
+//     width: 100%;
+// }
+.btn-center {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+    margin-top: -10px;
+}
+
+.mtreprocess {
+    margin-top: 30px;
+}
+
+.inp_ml {
+    margin-left: -14px;
+}
+
+.radio_pt {
+    padding-top: 7px;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+    -ms-transform: scale(1.5);
+    /* IE 9 */
+    -webkit-transform: scale(1.5);
+    /* Chrome, Safari, Opera */
+    transform: scale(1.5);
+}
+
+.formgroup_pl {
+    padding-left: 30px;
+}
+
+.mtreprocess__searchoptions {}
+
+.mtreprocess__gridview {
+    height: 300px;
+    overflow: scroll;
+}
+
+
+/* Validate css */
+
+.form-control.ng-touched.ng-invalid {
+    border: 1px solid red;
+}
+
+.form-control.ng-touched.ng-valid {
+    border: 1px solid green;
+}
+
+.row-mt {
+    margin-top: -2%;
+}
+
+.btn_pd-2 {
+    padding: 2px;
+}
+
+.row_mt-30 {
+    margin-top: 30px;
+}
+
+.table td {
+    text-align: center;
+}
+
+table th {
+    text-align: center;
+    vertical-align: top;
+}
+
+.filename {
+    text-align: left !important;
+    word-break: break-all;
+}
