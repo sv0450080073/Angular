@@ -44,7 +44,9 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let item of trackDataGrid">
-                        <td class="col-sm-1"> <input [checked]="item.IsChecked" disabled type="checkbox"></td>
+                        <td class="col-sm-1">
+                            <input [checked]="item.IsChecked" (change)="onCheckboxValue($event,item)" [disabled]="item.IsDisable" type="checkbox">
+                        </td>
                         <td class="col-sm-1"> {{item.InOutboxId}}</td>
                         <td class="col-sm-1">{{item.TransactionType}}</td>
                         <td class="col-sm-2">{{item.IntergrationStatus}}</td>
@@ -92,7 +94,7 @@
                         <div class="col-md-4">
                             <div class="form-group row formgroup_pl">
                                 <label class="col-sm-6 col-form-label" for="">Number of Threads: </label>
-                                <input class="form-control col-sm-3" maxlength="3" formControlName="numberOfThread" type="number">
+                                <input class="form-control col-sm-3" (ngModelChange)="onChangenumberOfThread($event)" maxlength="3" formControlName="numberOfThread" type="number">
                                 <small *ngIf="numberOfThread.invalid && numberOfThread.touched" class="text-danger align-self-center">01 < Number of Threads < 100, numbers are only allowed.</small>
                             </div>
                         </div>
@@ -131,10 +133,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let item of trackDataGrid">
-                            <td class="col-sm-2">{{item.InOutboxId}}</td>
-                            <td class="col-sm-2">{{item.TransactionType}}</td>
-                            <td class="col-sm-2">{{item.IntergrationStatus}}</td>
+                        <tr *ngFor="let item of  mtReprocessGrid">
+                            <td class="col-sm-2">{{item.InOuboxId}}</td>
+                            <td class="col-sm-2">{{item.CustomerId}}</td>
+                            <td class="col-sm-2">{{item.YearQuarter}}</td>
                             <td class="col-sm-6">{{item.Note}}</td>
                         </tr>
                     </tbody>

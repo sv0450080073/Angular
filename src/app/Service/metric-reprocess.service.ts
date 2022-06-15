@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { MtReprocessDataGrid } from '../Model/mt-reprocess-data-grid';
 import { ReprocessSearch } from '../Model/reprocess-search';
 import { TrackDataGrid } from '../shared/track-data-grid';
 import { TrackSearch } from '../shared/track-search';
@@ -16,9 +17,9 @@ export class MetricReprocessService {
   {
     return this.httpClient.post<TrackDataGrid[]>(this.url + "/TrackStatusFile",trackSearch);
   }
-  mtReprocess(reprocessSearch : ReprocessSearch) : Observable<TrackDataGrid[]>
+  mtReprocess(reprocessSearch : ReprocessSearch) : Observable<MtReprocessDataGrid[]>
   {
-    return this.httpClient.post<TrackDataGrid[]>(this.url + "/MTReprocess",reprocessSearch);
+    return this.httpClient.post<MtReprocessDataGrid[]>(this.url + "/MTReprocess",reprocessSearch);
   }
 
 }

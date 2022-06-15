@@ -1,7 +1,10 @@
+import { isNgTemplate } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { isEmptyObject } from 'jquery';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
+import { MtReprocessDataGrid } from '../Model/mt-reprocess-data-grid';
 
 import { ReprocessSeaarchcondition } from '../Model/reprocess-seaarchcondition';
 import { ReprocessSearch } from '../Model/reprocess-search';
@@ -16,13 +19,15 @@ import { TrackSearch } from '../shared/track-search';
 })
 export class MetricReprocessComponent implements OnInit {
   isLoading: boolean = false;
-  isSubmitFormReprocess : boolean = false;
+  isSubmitFormReprocess: boolean = false;
   rfTrackFile: FormGroup;
   rfSearchReprocess: FormGroup;
   trackSearch: TrackSearch;
   trackDataGrid: TrackDataGrid[];
   reprocessSearch: ReprocessSearch;
+  mtReprocessGrid: MtReprocessDataGrid[];
   isChecked: boolean;
+  isReprocess: boolean;
   constructor(private mtReprocessService: MetricReprocessService, private toastr: ToastrService) { }
 
   ngOnInit() {
@@ -38,7 +43,7 @@ export class MetricReprocessComponent implements OnInit {
         Validators.maxLength(3)
       ]),
       importServiceUrl: new FormControl('', Validators.required),
-      isUseMTImportService: new FormControl(false, null),
+      isUseMTImportService: new FormControl(true, null),
       runOptions: new FormControl('multi', null),
     });
   }
@@ -49,21 +54,7 @@ export class MetricReprocessComponent implements OnInit {
       console.log(this.rfTrackFile.valid);
       if (this.rfTrackFile.valid && !this.isLoading) {
         var files = this.rfTrackFile.value.files;
-        console.log(files);
-        if (files) {
-          var cutStr = files.trim().split('\n');
-          var datas = cutStr.map(this.filesHandler);
-          if (datas) {
-            this.isLoading = true;
-            this.getStatusFile(datas);
-          }
-          else {
-            // Fail alert
-          }
-        }
-        else {
-          //File error
-        }
+        this.getStatusFileGrid(files);
       }
     }
     catch {
@@ -71,31 +62,27 @@ export class MetricReprocessComponent implements OnInit {
     }
   }
   onSubmitReprocess() {
+    var trackGridHaveItemChecked: TrackDataGrid[] = [];
+    trackGridHaveItemChecked = this.trackDataGrid.filter(function (item, index) {
+      return item.IsChecked === true;
+    })
     var formValue = this.rfSearchReprocess.value;
-    console.log(this.rfSearchReprocess.value);
     let searchCondition = {} as ReprocessSeaarchcondition;
     searchCondition.FlowId = 1; // phase 1
     searchCondition.IsImportMetric = formValue.isUseMTImportService;
     searchCondition.IsRunMultiThread = this.isRunMultiThread(formValue.runOptions.toLowerCase());
-    searchCondition.IsRunParallel =  !this.isRunMultiThread(formValue.runOptions.toLowerCase());
-    searchCondition.NumberOfThread = this.getNumberFromForm(formValue.numberOfThread , 0,100);
+    searchCondition.IsRunParallel = !this.isRunMultiThread(formValue.runOptions.toLowerCase());
+    searchCondition.NumberOfThread = this.getNumberFromForm(formValue.numberOfThread, 0, 100);
     searchCondition.ImportServiceUrl = this.getStringFromForm(formValue.importServiceUrl);
     let data = {} as ReprocessSearch;
     data.SearchCondition = searchCondition;
-    data.TrackDataGrid = this.trackDataGrid;
+    data.TrackDataGrid = trackGridHaveItemChecked;
     this.reprocessSearch = data;
-    this.checkValidFormBeforeSubmitReprocess();
-    if(this.isSubmitFormReprocess)
-    {
+    this.checkValidFormBeforeSubmitReprocess(trackGridHaveItemChecked);
+    if (this.isSubmitFormReprocess) {
       this.mtReprocess(this.reprocessSearch);
     }
-
-    //check issubmit form cuar reprocess data
-
   }
-
-
-
   //#region  Property
   get files() {
     return this.rfTrackFile.get('files');
@@ -137,7 +124,8 @@ export class MetricReprocessComponent implements OnInit {
     trackGridItem.IntergrationStatus = item.IntergrationStatus;
     trackGridItem.FileName = item.FileName;
     trackGridItem.Note = item.Note;
-    trackGridItem.Files = item.Files;
+    trackGridItem.FilePath = item.FilePath;
+    trackGridItem.Index  = item.Index;
     var inteStatus = item.TransactionType.toLowerCase();
     var note = item.Note.toLowerCase();
     var isCheckedItem = false;
@@ -145,9 +133,20 @@ export class MetricReprocessComponent implements OnInit {
       && !note.toLowerCase().includes("not exist in diasciir9 database")) {
       isCheckedItem = true;
     }
-    trackGridItem.IsChecked = isCheckedItem;
+    if (isCheckedItem) {
+      trackGridItem.IsChecked = isCheckedItem;
+      trackGridItem.IsDisable = isCheckedItem;
+    }
+
+
     return trackGridItem;
   }
+
+  getFilesChecked(accumulator, currentValue, currentIndex, originArray) {
+    return accumulator += currentValue.FilePath + "\n";
+  }
+
+
   onUnsuccessOrNotImpBtnClick() {
     if (this.trackDataGrid) {
       this.isLoading = true;
@@ -156,6 +155,7 @@ export class MetricReprocessComponent implements OnInit {
       this.isLoading = false;
     }
   }
+
   isCheckedItem(inteStatus: string, note: string) {
     inteStatus = inteStatus.toLowerCase();
     if (inteStatus !== "success" && inteStatus !== "pass" && inteStatus !== "hold" && inteStatus !== "importing"
@@ -175,65 +175,133 @@ export class MetricReprocessComponent implements OnInit {
       return true;
     }
   }
-  getNumberFromForm(value: number , minValue:  number , maxValue : number)
-  {
-    if(value > minValue  && value <= maxValue )
-    {
+  getNumberFromForm(value: number, minValue: number, maxValue: number) {
+    if (value > minValue && value <= maxValue) {
       return value;
     }
     return 0;
   }
-  getStringFromForm(value:string)
-  {
+  getStringFromForm(value: string) {
     value = value.trim();
-    if(value ==="" || value === undefined || value ===null )
-    return "";
+    if (value === "" || value === undefined || value === null)
+      return "";
     else
-    return value;
+      return value;
   }
-  checkValidFormBeforeSubmitReprocess()
-  {
-      if(this.rfSearchReprocess.valid && !this.isLoading )
-      {
-        if(this.trackDataGrid !== undefined  && this.trackDataGrid.length > 0  && this.trackDataGrid)
-        {
-          this.isSubmitFormReprocess = true;
-        }
-        else
-        {
-          this.isSubmitFormReprocess = false;;
-        }
+  checkValidFormBeforeSubmitReprocess(trackGridHaveItemChecked) {
+    if (this.rfSearchReprocess.valid && !this.isLoading) {
+      if (trackGridHaveItemChecked !== undefined && trackGridHaveItemChecked.length > 0
+        && trackGridHaveItemChecked) {
+        this.isSubmitFormReprocess = true;
       }
-      else
-      {
-        this.isSubmitFormReprocess = false;;
+      else {
+        this.isSubmitFormReprocess = false;
       }
+    }
+    else {
+      this.isSubmitFormReprocess = false;
+    }
+  }
+  onChangenumberOfThread(e) {
+    if (isNaN(+e)) {
+      this.rfSearchReprocess.value.numberOfThread = 5;
+    }
+    else {
+      this.rfSearchReprocess.value.numberOfThread = e;
+    }
+  }
+  onCheckboxValue(ev, data) {
+    if (data) {
+      this.trackDataGrid.forEach(function (item, index) {
+        if (!item.IsDisable) {
+          if (item.Index === data.Index) {
+            if (ev.target.checked) {
+              item.IsChecked = true;
+            }
+            else {
+              item.IsChecked = false;
+            }
+          }
+         }
+      });
+    }
+  }
+  //#endregion
+
+  //#region  CALL Service
+  getStatusFileGrid(files) {
+    if (files) {
+      var cutStr = files.trim().split('\n');
+      var datas = cutStr.map(this.filesHandler);
+      if (datas) {
+        this.isLoading = true;
+        this.mtReprocessService.getStatusFiles(datas).subscribe(res => {
+          this.isLoading = false;
+          this.trackDataGrid = res;
+          console.log(this.trackDataGrid);
+          this.alertSuccess("Track status " + this.trackDataGrid.length);
+        })
+      }
+      else {
+        // Fail alert
+      }
+    }
+    else {
+      //File error
+    }
+  }
+
+  mtReprocess(reprocessSearch: ReprocessSearch) {
+    if (reprocessSearch) {
+      this.isLoading = true;
+      this.mtReprocessService.mtReprocess(reprocessSearch).subscribe(res => {
+        this.mtReprocessGrid = res;
+      })
+      if (this.rfSearchReprocess.value.isUseMTImportService) {
+        this.getStatusFileGrid(this.files)
+        // var checkedFiles = reprocessSearch.TrackDataGrid.reduce(this.getFilesChecked, "");
+        // var trackFileReprocess = reprocessSearch.TrackDataGrid.map(this.getTrackFileReprocessItem);
+      }
+    }
+    //Call TrackGrid again
+
+  }
+  //Not Use
+  getTrackFileReprocessItem(item, index) {
+    if (item.FilePath.trim()) {
+      var fieds = item.FilePath.trim().split('_');
+      let obj = {} as TrackSearch;
+      obj.Index = item.Index;
+      obj.PTransKeyIdIndex = fieds[0] + fieds[1];
+      obj.PInboxIdIndex = fieds[2];
+      obj.POutboxIdIndex = fieds[2];
+      obj.PYearQuaterIdIndex = fieds[3];
+      obj.PFromCustIdIndex = fieds[4];
+      obj.PToCustIdIndex = fieds[5];
+      obj.PTransactionIdIndex = fieds[6];
+      obj.PVersionIndex = fieds[7];
+      obj.PCodePage = fieds[8];
+      obj.Item08 = fieds[9];
+      obj.Item09 = fieds[10];
+      obj.Item10 = fieds[11];
+      obj.FlowId = 1;
+      obj.EndItem = fieds[11].split('.')[0];
+      obj.Files = item.FilePath;
+      obj.IsReprocess = true;
+      return obj;
+    }
+    else {
+      return null;
+    }
+
   }
   //#endregion
   //#region  Alert Toasrt
-
   alertSuccess(message: string) {
     this.toastr.success(message, "Success");
   }
   alertError(message: string) {
     this.toastr.error(message, "Fail");
-  }
-  //#endregion
-  //#region  CALL Service
-  getStatusFile(datas) {
-    this.mtReprocessService.getStatusFiles(datas).subscribe(res => {
-      this.isLoading = false;
-      this.trackDataGrid = res;
-      console.log(res);
-      this.alertSuccess("Track status " + this.trackDataGrid.length);
-    })
-  }
-  mtReprocess(reprocessSearch)
-  {
-    this.mtReprocessService.mtReprocess(reprocessSearch).subscribe(res => {
-      console.log("Success");
-
-    })
   }
   //#endregion
 }

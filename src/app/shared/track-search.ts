@@ -1,4 +1,6 @@
 export class TrackSearch {
+
+  public Index : number;
   public  Files :string;
   public  FlowId : number;
   public  PTransKeyIdIndex :string;
@@ -15,4 +17,5 @@ export class TrackSearch {
   public  Item10:string;
   public  EndItem :string;
   public  Extension:string;
+  public IsReprocess : boolean;
 }
