@@ -32,7 +32,8 @@ export class MetricReprocessComponent implements OnInit {
 
   ngOnInit() {
     this.rfTrackFile = new FormGroup({
-      files: new FormControl('', Validators.required)
+      files: new FormControl(""
+        , Validators.required)
     });
     this.rfSearchReprocess = new FormGroup({
       remainProcess: new FormControl(1, Validators.required),
@@ -48,10 +49,8 @@ export class MetricReprocessComponent implements OnInit {
     });
   }
 
-  onSubmitTrack() {
+  onSubmitBtnTrack() {
     try {
-      console.log(this.isLoading);
-      console.log(this.rfTrackFile.valid);
       if (this.rfTrackFile.valid && !this.isLoading) {
         var files = this.rfTrackFile.value.files;
         this.getStatusFileGrid(files);
@@ -77,10 +76,13 @@ export class MetricReprocessComponent implements OnInit {
     let data = {} as ReprocessSearch;
     data.SearchCondition = searchCondition;
     data.TrackDataGrid = trackGridHaveItemChecked;
+    console.log("onSubmitReprocess");
+    console.log(trackGridHaveItemChecked);
+
     this.reprocessSearch = data;
     this.checkValidFormBeforeSubmitReprocess(trackGridHaveItemChecked);
     if (this.isSubmitFormReprocess) {
-      this.mtReprocess(this.reprocessSearch);
+      this.getReprocessGrid(this.reprocessSearch);
     }
   }
   //#region  Property
@@ -97,22 +99,23 @@ export class MetricReprocessComponent implements OnInit {
   //#endregion
   //#region  Method
   filesHandler(file, index) {
-    var fieds = file.trim().split('_');
+    var fileRemovePath = file.slice(file.trim().lastIndexOf("\\") + 1);
+    var fieds = fileRemovePath.trim().split('_');
     let obj = {} as TrackSearch;
-    obj.PTransKeyIdIndex = fieds[0] + fieds[1];
-    obj.PInboxIdIndex = fieds[2];
-    obj.POutboxIdIndex = fieds[2];
-    obj.PYearQuaterIdIndex = fieds[3];
-    obj.PFromCustIdIndex = fieds[4];
-    obj.PToCustIdIndex = fieds[5];
-    obj.PTransactionIdIndex = fieds[6];
-    obj.PVersionIndex = fieds[7];
-    obj.PCodePage = fieds[8];
-    obj.Item08 = fieds[9];
-    obj.Item09 = fieds[10];
-    obj.Item10 = fieds[11];
+    obj.PTransKeyIdIndex = fieds[0];
+    obj.PInboxIdIndex = fieds[1];
+    obj.POutboxIdIndex = fieds[1];
+    obj.PYearQuaterIdIndex = fieds[2];
+    obj.PFromCustIdIndex = fieds[3];
+    obj.PToCustIdIndex = fieds[4];
+    obj.PTransactionIdIndex = fieds[5];
+    obj.PVersionIndex = fieds[6];
+    obj.PCodePage = fieds[7];
+    obj.Item08 = fieds[8];
+    obj.Item09 = fieds[9];
+    obj.Item10 = fieds[10];
     obj.FlowId = 1;
-    obj.EndItem = fieds[11].split('.')[0];
+    obj.EndItem = fieds[10].split('.')[0];
     obj.Files = file;
     return obj;
   }
@@ -125,33 +128,56 @@ export class MetricReprocessComponent implements OnInit {
     trackGridItem.FileName = item.FileName;
     trackGridItem.Note = item.Note;
     trackGridItem.FilePath = item.FilePath;
-    trackGridItem.Index  = item.Index;
-    var inteStatus = item.TransactionType.toLowerCase();
+    trackGridItem.Index = item.Index;
+    trackGridItem.CustomerId = item.CustomerId;
+    trackGridItem.YearQuarter = item.YearQuarter;
+    var inteStatus = item.IntergrationStatus.toLowerCase();
     var note = item.Note.toLowerCase();
     var isCheckedItem = false;
     if (inteStatus !== "success" && inteStatus !== "pass" && inteStatus !== "hold" && inteStatus !== "importing"
       && !note.toLowerCase().includes("not exist in diasciir9 database")) {
       isCheckedItem = true;
     }
-    if (isCheckedItem) {
-      trackGridItem.IsChecked = isCheckedItem;
-      trackGridItem.IsDisable = isCheckedItem;
-    }
-
-
+    trackGridItem.IsChecked = isCheckedItem;
+    trackGridItem.IsDisable = isCheckedItem;
     return trackGridItem;
   }
+  trackFileReprocessItemHandler(item, index) {
+    if (item) {
+      var fieds = item.trim().split('_');
+      let obj = {} as TrackSearch;
+      obj.PTransKeyIdIndex = fieds[0]
+      obj.PInboxIdIndex = fieds[1];
+      obj.POutboxIdIndex = fieds[1];
+      obj.PYearQuaterIdIndex = fieds[2];
+      obj.PFromCustIdIndex = fieds[3];
+      obj.PToCustIdIndex = fieds[4];
+      obj.PTransactionIdIndex = fieds[5];
+      obj.PVersionIndex = fieds[6];
+      obj.PCodePage = fieds[7];
+      obj.Item08 = fieds[8];
+      obj.Item09 = fieds[9];
+      obj.Item10 = fieds[10].split('_')[0];
+      obj.FlowId = 1;
+      obj.EndItem = fieds[10].split('.')[0];
+      obj.Extension = fieds[10].split('.')[1];
+      obj.IsReprocess = true;
+      obj.Index = fieds[11];
+      return obj;
+    }
+    else {
+      return null;
+    }
 
-  getFilesChecked(accumulator, currentValue, currentIndex, originArray) {
-    return accumulator += currentValue.FilePath + "\n";
   }
-
-
+  getFilesChecked(accumulator, currentValue, currentIndex, originArray) {
+    let infoReprocess = "_" + currentValue.Index;
+    return accumulator += currentValue.FilePath + infoReprocess + "\n";
+  }
   onUnsuccessOrNotImpBtnClick() {
     if (this.trackDataGrid) {
       this.isLoading = true;
       this.trackDataGrid = this.trackDataGrid.map(this.trackDataGridHandler);
-      console.log(this.trackDataGrid);
       this.isLoading = false;
     }
   }
@@ -222,9 +248,22 @@ export class MetricReprocessComponent implements OnInit {
               item.IsChecked = false;
             }
           }
-         }
+        }
       });
     }
+  }
+  updateStatusTrackGridThenReporcess(trackdataGridNew: TrackDataGrid[]) {
+    for (const item of trackdataGridNew) {
+      this.showUpdatedItem(item);
+    }
+  }
+  showUpdatedItem(newItem) {
+    let updateItem = this.trackDataGrid.find(this.findIndexToUpdate, newItem.Index);
+    let index = this.trackDataGrid.indexOf(updateItem);
+    this.trackDataGrid[index] = newItem;
+  }
+  findIndexToUpdate(newItem) {
+    return newItem.Index === this;
   }
   //#endregion
 
@@ -232,13 +271,15 @@ export class MetricReprocessComponent implements OnInit {
   getStatusFileGrid(files) {
     if (files) {
       var cutStr = files.trim().split('\n');
+      console.log(cutStr);
       var datas = cutStr.map(this.filesHandler);
+      console.log(datas);
       if (datas) {
         this.isLoading = true;
         this.mtReprocessService.getStatusFiles(datas).subscribe(res => {
           this.isLoading = false;
           this.trackDataGrid = res;
-          console.log(this.trackDataGrid);
+          console.log(res);
           this.alertSuccess("Track status " + this.trackDataGrid.length);
         })
       }
@@ -251,49 +292,36 @@ export class MetricReprocessComponent implements OnInit {
     }
   }
 
-  mtReprocess(reprocessSearch: ReprocessSearch) {
+  getReprocessGrid(reprocessSearch: ReprocessSearch) {
     if (reprocessSearch) {
       this.isLoading = true;
       this.mtReprocessService.mtReprocess(reprocessSearch).subscribe(res => {
         this.mtReprocessGrid = res;
+        this.isLoading = false;
+        this.alertSuccess("Reprocess success !");
       })
       if (this.rfSearchReprocess.value.isUseMTImportService) {
-        this.getStatusFileGrid(this.files)
-        // var checkedFiles = reprocessSearch.TrackDataGrid.reduce(this.getFilesChecked, "");
-        // var trackFileReprocess = reprocessSearch.TrackDataGrid.map(this.getTrackFileReprocessItem);
+        var checkedFiles = reprocessSearch.TrackDataGrid.reduce(this.getFilesChecked, "");
+        if (checkedFiles) {
+          var cutStr = checkedFiles.trim().split('\n');
+          var datas = cutStr.map(this.trackFileReprocessItemHandler);
+          if (datas) {
+            this.isLoading = true;
+            this.mtReprocessService.getStatusFiles(datas).subscribe(res => {
+            this.isLoading = false;
+            this.updateStatusTrackGridThenReporcess(res);
+            this.alertSuccess("Update status track view success !");
+            })
+          }
+          else {
+            // Fail alert
+          }
+        }
+        else {
+          //File error
+        }
       }
     }
-    //Call TrackGrid again
-
-  }
-  //Not Use
-  getTrackFileReprocessItem(item, index) {
-    if (item.FilePath.trim()) {
-      var fieds = item.FilePath.trim().split('_');
-      let obj = {} as TrackSearch;
-      obj.Index = item.Index;
-      obj.PTransKeyIdIndex = fieds[0] + fieds[1];
-      obj.PInboxIdIndex = fieds[2];
-      obj.POutboxIdIndex = fieds[2];
-      obj.PYearQuaterIdIndex = fieds[3];
-      obj.PFromCustIdIndex = fieds[4];
-      obj.PToCustIdIndex = fieds[5];
-      obj.PTransactionIdIndex = fieds[6];
-      obj.PVersionIndex = fieds[7];
-      obj.PCodePage = fieds[8];
-      obj.Item08 = fieds[9];
-      obj.Item09 = fieds[10];
-      obj.Item10 = fieds[11];
-      obj.FlowId = 1;
-      obj.EndItem = fieds[11].split('.')[0];
-      obj.Files = item.FilePath;
-      obj.IsReprocess = true;
-      return obj;
-    }
-    else {
-      return null;
-    }
-
   }
   //#endregion
   //#region  Alert Toasrt

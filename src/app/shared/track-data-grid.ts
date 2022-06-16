@@ -8,4 +8,6 @@ export class TrackDataGrid {
   public  Note :string;
   public  FilePath :string;
   public  IsDisable : boolean;
+  public  CustomerId :string;
+  public  YearQuarter : string;
 }
