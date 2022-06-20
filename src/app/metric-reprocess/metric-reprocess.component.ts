@@ -295,32 +295,34 @@ export class MetricReprocessComponent implements OnInit {
   getReprocessGrid(reprocessSearch: ReprocessSearch) {
     if (reprocessSearch) {
       this.isLoading = true;
-      this.mtReprocessService.mtReprocess(reprocessSearch).subscribe(res => {
+      this.mtReprocessService.mtReprocess(reprocessSearch).toPromise()
+      .then(res => {
         this.mtReprocessGrid = res;
         this.isLoading = false;
         this.alertSuccess("Reprocess success !");
-      })
-      if (this.rfSearchReprocess.value.isUseMTImportService) {
-        var checkedFiles = reprocessSearch.TrackDataGrid.reduce(this.getFilesChecked, "");
-        if (checkedFiles) {
-          var cutStr = checkedFiles.trim().split('\n');
-          var datas = cutStr.map(this.trackFileReprocessItemHandler);
-          if (datas) {
-            this.isLoading = true;
-            this.mtReprocessService.getStatusFiles(datas).subscribe(res => {
-            this.isLoading = false;
-            this.updateStatusTrackGridThenReporcess(res);
-            this.alertSuccess("Update status track view success !");
-            })
+      }).then (res=> {
+        if (this.rfSearchReprocess.value.isUseMTImportService) {
+          var checkedFiles = reprocessSearch.TrackDataGrid.reduce(this.getFilesChecked, "");
+          if (checkedFiles) {
+            var cutStr = checkedFiles.trim().split('\n');
+            var datas = cutStr.map(this.trackFileReprocessItemHandler);
+            if (datas) {
+              this.isLoading = true;
+              this.mtReprocessService.getStatusFiles(datas).subscribe(res => {
+                this.isLoading = false;
+                this.updateStatusTrackGridThenReporcess(res);
+                this.alertSuccess("Update status track view success !");
+              })
+            }
+            else {
+              // Fail alert
+            }
           }
           else {
-            // Fail alert
+            //File error
           }
         }
-        else {
-          //File error
-        }
-      }
+      })
     }
   }
   //#endregion
