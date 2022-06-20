@@ -36,16 +36,7 @@ export class MetricReprocessComponent implements OnInit {
         , Validators.required)
     });
     this.rfSearchReprocess = new FormGroup({
-      remainProcess: new FormControl(1, Validators.required),
-      numberOfThread: new FormControl(5, [
-        Validators.required,
-        Validators.min(1),
-        Validators.max(100),
-        Validators.maxLength(3)
-      ]),
-      importServiceUrl: new FormControl('', Validators.required),
-      isUseMTImportService: new FormControl(true, null),
-      runOptions: new FormControl('multi', null),
+      isUseMTImportService: new FormControl(true, null)
     });
   }
 
@@ -62,40 +53,30 @@ export class MetricReprocessComponent implements OnInit {
   }
   onSubmitReprocess() {
     var trackGridHaveItemChecked: TrackDataGrid[] = [];
-    trackGridHaveItemChecked = this.trackDataGrid.filter(function (item, index) {
-      return item.IsChecked === true;
-    })
-    var formValue = this.rfSearchReprocess.value;
-    let searchCondition = {} as ReprocessSeaarchcondition;
-    searchCondition.FlowId = 1; // phase 1
-    searchCondition.IsImportMetric = formValue.isUseMTImportService;
-    searchCondition.IsRunMultiThread = this.isRunMultiThread(formValue.runOptions.toLowerCase());
-    searchCondition.IsRunParallel = !this.isRunMultiThread(formValue.runOptions.toLowerCase());
-    searchCondition.NumberOfThread = this.getNumberFromForm(formValue.numberOfThread, 0, 100);
-    searchCondition.ImportServiceUrl = this.getStringFromForm(formValue.importServiceUrl);
-    let data = {} as ReprocessSearch;
-    data.SearchCondition = searchCondition;
-    data.TrackDataGrid = trackGridHaveItemChecked;
-    console.log("onSubmitReprocess");
-    console.log(trackGridHaveItemChecked);
-
-    this.reprocessSearch = data;
-    this.checkValidFormBeforeSubmitReprocess(trackGridHaveItemChecked);
-    if (this.isSubmitFormReprocess) {
-      this.getReprocessGrid(this.reprocessSearch);
+    if(this.trackDataGrid)
+    {
+      trackGridHaveItemChecked = this.trackDataGrid.filter(function (item, index) {
+        return item.IsChecked === true;
+      })
+      var formValue = this.rfSearchReprocess.value;
+      let searchCondition = {} as ReprocessSeaarchcondition;
+      searchCondition.FlowId = 1; // phase 1
+      searchCondition.IsImportMetric = formValue.isUseMTImportService;
+      let data = {} as ReprocessSearch;
+      data.SearchCondition = searchCondition;
+      data.TrackDataGrid = trackGridHaveItemChecked;
+      this.reprocessSearch = data;
+      this.checkValidFormBeforeSubmitReprocess(trackGridHaveItemChecked);
+      if (this.isSubmitFormReprocess) {
+        this.getReprocessGrid(this.reprocessSearch);
+      }
     }
+
   }
   //#region  Property
   get files() {
     return this.rfTrackFile.get('files');
   }
-  get importServiceUrl() {
-    return this.rfSearchReprocess.get('importServiceUrl');
-  }
-  get numberOfThread() {
-    return this.rfSearchReprocess.get('numberOfThread');
-  }
-
   //#endregion
   //#region  Method
   filesHandler(file, index) {
@@ -226,14 +207,6 @@ export class MetricReprocessComponent implements OnInit {
     }
     else {
       this.isSubmitFormReprocess = false;
-    }
-  }
-  onChangenumberOfThread(e) {
-    if (isNaN(+e)) {
-      this.rfSearchReprocess.value.numberOfThread = 5;
-    }
-    else {
-      this.rfSearchReprocess.value.numberOfThread = e;
     }
   }
   onCheckboxValue(ev, data) {

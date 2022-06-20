@@ -7,7 +7,6 @@
 </nav>
 <div class="tab-content" id="nav-tabContent">
     <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-
         <div class="track">
             <form novalidate (ngSubmit)="onSubmitBtnTrack()" [formGroup]="rfTrackFile">
                 <div class="form-group row">
@@ -61,8 +60,8 @@
         <div class="mtreprocess">
             <div class="mtreprocess__searchoptions">
                 <form novalidate (ngSubmit)="onSubmitReprocess()" [formGroup]="rfSearchReprocess">
-                    <div class="form-row">
-                        <div class="col-md-3 ">
+                    <div class="form-row row-ml-40 ">
+                        <div class="col-md-4 ">
                             <div class="form-check ">
                                 <input type="checkbox" formControlName="isUseMTImportService" class="form-check-input" id="exampleCheck1">
                                 <label class="form-check-label" for="exampleCheck1">Use MT ImportService to import data</label>
@@ -71,53 +70,8 @@
                         <div class="col-md-4">
                             <button class="btn btn-outline-secondary" (click)="onUnsuccessOrNotImpBtnClick()" type="button">Select all UnSuccess OR Not Importing documents</button>
                         </div>
-                        <div class="text-center col-md-2 ">
-                            <button class="btn btn-primary" [disabled]="!rfSearchReprocess.valid" type="submit">Reprocess</button>
-                        </div>
-                        <div class="col-md-3 ">
-                            <div class="form-group row">
-                                <label class="col-sm-8 col-form-label" for="">Remaining Processing: </label>
-                                <input class="form-control col-sm-4 inp_ml" formControlName="remainProcess" type="number">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-row">
-
-                        <div class="col-md-2">
-                            <div class="form-check radio_pt">
-                                <input class="form-check-input" formControlName="runOptions" type="radio" name="runOptions" id="exampleRadios1" value="multi" checked>
-                                <label class="form-check-label" for="exampleRadios1">
-                          Run with Multi Thread
-                    </label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group row formgroup_pl">
-                                <label class="col-sm-6 col-form-label" for="">Number of Threads: </label>
-                                <input class="form-control col-sm-3" (ngModelChange)="onChangenumberOfThread($event)" maxlength="3" formControlName="numberOfThread" type="number">
-                                <small *ngIf="numberOfThread.invalid && numberOfThread.touched" class="text-danger align-self-center">01 < Number of Threads < 100, numbers are only allowed.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="col-sm-4 col-form-label" for="">Import Service Url: </label>
-                                <input class="form-control col-sm-8 inp_ml" formControlName="importServiceUrl" type="text">
-                                <small *ngIf="importServiceUrl.invalid && importServiceUrl.touched" class="text-danger col align-self-center row  justify-content-center">Import Service Url is required. </small>
-
-                            </div>
-
-
-                        </div>
-                    </div>
-                    <div class="form-row row-mt">
-
-                        <div class="col-md-2">
-                            <div class="form-check radio_pt">
-                                <input class="form-check-input" formControlName="runOptions" type="radio" name="runOptions" id="exampleRadios2" value="parallel">
-                                <label class="form-check-label" for="exampleRadios1">
-                          Run with For Parallel
-                                </label>
-                            </div>
+                        <div class="text-center col-md-3 ">
+                            <button class="btn btn-primary" type="submit">Reprocess</button>
                         </div>
                     </div>
                 </form>
