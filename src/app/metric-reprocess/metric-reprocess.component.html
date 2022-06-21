@@ -33,7 +33,7 @@
             <table class="table-wrapper table table-bordered  ">
                 <thead>
                     <tr>
-                        <th class="col-sm-1"></th>
+                        <th class="col-sm-1"><input [checked]="isAllCheckBoxChecked()" type="checkbox" (change)="onCheckboxAll($event)"></th>
                         <th class="col-sm-1 ">Inbox/Outbox Id</th>
                         <th class="col-sm-1">Transaction type</th>
                         <th class="col-sm-2">Integration Status</th>

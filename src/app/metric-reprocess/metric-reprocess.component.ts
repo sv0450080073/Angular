@@ -225,6 +225,20 @@ export class MetricReprocessComponent implements OnInit {
       });
     }
   }
+  onCheckboxAll(ev) {
+      this.trackDataGrid.forEach(function (item, index) {
+            if (ev.target.checked) {
+              item.IsChecked = true;
+            }
+            else {
+              item.IsChecked = false;
+            }
+      });
+
+  }
+  isAllCheckBoxChecked() {
+		return this.trackDataGrid.every(p => p.IsChecked);
+	}
   updateStatusTrackGridThenReporcess(trackdataGridNew: TrackDataGrid[]) {
     for (const item of trackdataGridNew) {
       this.showUpdatedItem(item);
@@ -244,24 +258,28 @@ export class MetricReprocessComponent implements OnInit {
   getStatusFileGrid(files) {
     if (files) {
       var cutStr = files.trim().split('\n');
-      console.log(cutStr);
       var datas = cutStr.map(this.filesHandler);
-      console.log(datas);
       if (datas) {
         this.isLoading = true;
         this.mtReprocessService.getStatusFiles(datas).subscribe(res => {
           this.isLoading = false;
           this.trackDataGrid = res;
-          console.log(res);
-          this.alertSuccess("Track status " + this.trackDataGrid.length);
+          if(this.trackDataGrid && this.trackDataGrid.length > 0 )
+          {
+            this.alertSuccess("Track files success !");
+          }
+          else
+          {
+            this.alertError("Track files fail !");
+          }
         })
       }
       else {
-        // Fail alert
+        this.alertError("Track files fail !");
       }
     }
     else {
-      //File error
+      this.alertError("Track files fail !");
     }
   }
 
@@ -272,7 +290,15 @@ export class MetricReprocessComponent implements OnInit {
       .then(res => {
         this.mtReprocessGrid = res;
         this.isLoading = false;
-        this.alertSuccess("Reprocess success !");
+        if(this.mtReprocessGrid && this.mtReprocessGrid.length > 0 )
+        {
+          this.alertSuccess("Reprocess success !");
+        }
+        else
+        {
+          this.alertError("Reprocess fail !");
+        }
+
       }).then (res=> {
         if (this.rfSearchReprocess.value.isUseMTImportService) {
           var checkedFiles = reprocessSearch.TrackDataGrid.reduce(this.getFilesChecked, "");
