@@ -237,7 +237,10 @@ export class MetricReprocessComponent implements OnInit {
 
   }
   isAllCheckBoxChecked() {
-		return this.trackDataGrid.every(p => p.IsChecked);
+    if(this.trackDataGrid)
+    {
+      return this.trackDataGrid.every(p => p.IsChecked);
+    }
 	}
   updateStatusTrackGridThenReporcess(trackdataGridNew: TrackDataGrid[]) {
     for (const item of trackdataGridNew) {

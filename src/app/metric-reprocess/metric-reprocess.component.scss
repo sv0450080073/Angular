@@ -65,6 +65,10 @@ input[type="checkbox"] {
 
 /* End Validate css */
 
+.row-mr-10 {
+    margin-right: 10px;
+}
+
 .row-ml-40 {
     margin-left: 40px;
 }
@@ -93,4 +97,13 @@ table th {
 .filename {
     text-align: left !important;
     word-break: break-all;
+}
+
+
+/* Media Screen */
+
+@media screen and (max-width: 991px) {
+    .rowmt-5 {
+        margin-top: 5px;
+    }
 }
